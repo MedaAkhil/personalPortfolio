@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-GfnfINHdBDbi6+kz8jM/+4oa5n/ecrnUUN4HHhh0MgG8Fxmks+9XckcxFCXYZoAJI4qOoJqigZhxdZ+htqKf8A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-G8bGgnlwJxS5P72MmQm3VKNQ2VrOmnZmf0u1NdTKnPvGTQoB24yE83cD/4A6JtwP3fX3f+6cEFnXhCzA66+7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Akhil Meda - Portfolio</title>
     <link rel="icon" href="https://i.pinimg.com/originals/ae/85/42/ae85429cef8ea3f523d46b8fd89bb297.jpg" type="image/jpeg">
     <style>
@@ -37,6 +39,7 @@
             margin-top: 10px;
             background: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: opacity 1s ease-out;
         }
         h2 {
             color: #333;
@@ -60,17 +63,21 @@
         .contact-info a:hover {
             text-decoration: underline;
         }
+        /* Custom fade-out effect */
+        .fade-out {
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
-    <header>
+    <header data-aos="fade-down">
         <div class="container">
             <h1>Akhil Meda</h1>
         </div>
     </header>
 
     <div class="container">
-        <section class="contact-info">
+        <section class="contact-info" data-aos="fade-up">
             <h2>Contact Information</h2>
             <ul>
                 <li>Phone: +919346342728</li>
@@ -81,14 +88,14 @@
             </ul>
         </section>
 
-        <section class="summary">
+        <section class="summary" data-aos="fade-up">
             <h2>Summary</h2>
             <p>
                 In the realm of web development, Machine Learning, Deep Learning, Cloud Technology, and DevOps, I have honed skills in front-end and back-end technologies. I am proficient in HTML, CSS, JavaScript, and have hands-on experience with popular frameworks such as Vue.js and Angular. I have built many intelligent models for ML tasks and have experience with various ML & DL frameworks. My strong technical skills, coupled with my enthusiasm for continuous learning, make me an invaluable asset to any team or organization seeking innovative solutions in these fields.
             </p>
         </section>
 
-        <section class="education">
+        <section class="education" data-aos="fade-up">
             <h2>Education</h2>
             <ul>
                 <li><strong>Bachelor of Engineering, Artificial Intelligence & Machine Learning, Anurag University</strong> - CGPA: 8.34</li>
@@ -97,7 +104,7 @@
             </ul>
         </section>
 
-        <section class="experience">
+        <section class="experience" data-aos="fade-up">
             <h2>Experiences</h2>
             <ul>
                 <li><strong>Vice-President</strong> at Computer Society of India Student Chapter</li>
@@ -107,7 +114,7 @@
             </ul>
         </section>
 
-        <section class="projects">
+        <section class="projects" data-aos="fade-up">
             <h2>Projects</h2>
             <ul>
                 <li><strong>Crime Detection System with Computer Vision</strong></li>
@@ -121,7 +128,7 @@
             </ul>
         </section>
 
-        <section class="skills">
+        <section class="skills" data-aos="fade-up">
             <h2>Technical Skills</h2>
             <ul>
                 <li><strong>Languages:</strong> Proficient in Python; Familiar with C++, Java, C, JavaScript, TypeScript</li>
@@ -132,7 +139,7 @@
             </ul>
         </section>
 
-        <section class="achievements">
+        <section class="achievements" data-aos="fade-up">
             <h2>Achievements</h2>
             <ul>
                 <li>State Science Fair Competition Award from Yuva Shakti Foundation</li>
@@ -140,5 +147,25 @@
             </ul>
         </section>
     </div>
+
+    <script>
+        // Initialize AOS
+        AOS.init();
+
+        // Fade out text on scroll
+        window.addEventListener('scroll', function () {
+            let sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                let rect = section.getBoundingClientRect();
+                let windowHeight = window.innerHeight;
+                if (rect.top > windowHeight || rect.bottom < 0) {
+                    section.classList.add('fade-out');
+                } else {
+                    section.classList.remove('fade-out');
+                }
+            });
+        });
+    </script>
 </body>
+
 </html>
