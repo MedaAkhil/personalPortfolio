@@ -34,6 +34,9 @@
         margin: 0;
         padding: 0;
       }
+      p{
+        text-align: justify;
+      }
       .container {
         width: 90%;
         margin: 0 auto;
@@ -43,7 +46,7 @@
       header {
         background: #333;
         color: #fff;
-        padding-top: 30px;
+        padding-top: 20px;
         min-height: 70px;
         border-bottom: #77aaff 3px solid;
         text-align: center;
@@ -131,6 +134,26 @@
           margin-bottom: 5px;
         }
       }
+      .star-cursor {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: yellow;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fadeOut 0.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
     </style>
   </head>
   <body>
