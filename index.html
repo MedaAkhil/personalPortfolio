@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" integrity="sha512-GfnfINHdBDbi6+kz8jM/+4oa5n/ecrnUUN4HHhh0MgG8Fxmks+9XckcxFCXYZoAJI4qOoJqigZhxdZ+htqKf8A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" integrity="sha512-G8bGgnlwJxS5P72MmQm3VKNQ2VrOmnZmf0u1NdTKnPvGTQoB24yE83cD/4A6JtwP3fX3f+6cEFnXhCzA66+7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet">
-    <!-- Custom CSS for fade-out effect -->
+
+    <!-- Custom CSS for fade-out effect and responsive design -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,9 +22,10 @@
             padding: 0;
         }
         .container {
-            width: 80%;
+            width: 90%;
             margin: 0 auto;
             overflow: hidden;
+            max-width: 1200px;
         }
         header {
             background: #333;
@@ -31,11 +33,11 @@
             padding-top: 30px;
             min-height: 70px;
             border-bottom: #77aaff 3px solid;
+            text-align: center;
         }
         header h1 {
-            text-align: center;
             margin: 0;
-            font-size: 24px;
+            font-size: 2em;
             letter-spacing: 2px;
         }
         section {
@@ -48,6 +50,7 @@
         h2 {
             color: #333;
             margin-bottom: 10px;
+            font-size: 1.5em;
         }
         ul {
             list-style-type: none;
@@ -63,6 +66,7 @@
             color: #333;
             text-decoration: none;
             margin-right: 10px;
+            word-wrap: break-word;
         }
         .contact-info a:hover {
             text-decoration: underline;
@@ -70,6 +74,42 @@
         /* Custom fade-out effect */
         .fade-out {
             opacity: 0;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.25em;
+            }
+            section {
+                padding: 15px;
+            }
+            body {
+                line-height: 1.4;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+            }
+            header h1 {
+                font-size: 1.2em;
+            }
+            h2 {
+                font-size: 1.1em;
+            }
+            section {
+                padding: 10px;
+            }
+            li {
+                font-size: 0.9em;
+            }
+            .contact-info a {
+                display: block;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -151,6 +191,7 @@
             </ul>
         </section>
     </div>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         AOS.init();
