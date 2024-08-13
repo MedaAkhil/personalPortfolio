@@ -68,6 +68,24 @@
             opacity: 0;
         }
     </style>
+    <script>
+        // Initialize AOS
+        AOS.init();
+
+        // Fade out text on scroll
+        window.addEventListener('scroll', function () {
+            let sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                let rect = section.getBoundingClientRect();
+                let windowHeight = window.innerHeight;
+                if (rect.top > windowHeight || rect.bottom < 0) {
+                    section.classList.add('fade-out');
+                } else {
+                    section.classList.remove('fade-out');
+                }
+            });
+        });
+    </script>
 </head>
 <body>
     <header data-aos="fade-down">
@@ -148,24 +166,7 @@
         </section>
     </div>
 
-    <script>
-        // Initialize AOS
-        AOS.init();
-
-        // Fade out text on scroll
-        window.addEventListener('scroll', function () {
-            let sections = document.querySelectorAll('section');
-            sections.forEach(section => {
-                let rect = section.getBoundingClientRect();
-                let windowHeight = window.innerHeight;
-                if (rect.top > windowHeight || rect.bottom < 0) {
-                    section.classList.add('fade-out');
-                } else {
-                    section.classList.remove('fade-out');
-                }
-            });
-        });
-    </script>
+    
 </body>
 
 </html>
