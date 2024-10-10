@@ -1,0 +1,75 @@
+.contactdivbox{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.contactdivbox a{
+    padding: 1px 5px 1px 5px;
+    border-radius: 7px;
+    background-color: rgb(64,147, 239);
+    color: white;
+    width: fit-content;
+    margin-top: 5px;
+    margin-left: 35px;
+}
+.contactdivlinkedin{
+    background-color: rgb(245,250,254);
+    border-radius: 10px;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px 20px 20px;
+    border: 1px solid rgb(240, 242, 244);
+}
+.contactdivlinkedin img{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+@media (max-width:800px){
+    .contactdivlinkedin{
+        flex: 60%;
+    }
+}
+
+.contactdivinstagram{
+    background-color: rgb(245,250,254);
+    border-radius: 10px;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 10px 20px 20px;
+    align-items: center;
+    border: 1px solid rgb(240, 242, 244);
+}
+.contactdivinstagram img{
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+@media (max-width:800px){
+    .contactdivinstagram{
+        flex: 60%;
+        font-size: 12px;
+    }
+    .contactdivlinkedin{
+        font-size: 12px;
+    }
+    .contactdivinstagram img{
+        width: 30px;
+        height: 30px;
+        margin-right: 5px;
+    }
+    .contactdivlinkedin img{
+        width: 30px;
+        height: 30px;
+        margin-right: 5px;
+    }
+}
