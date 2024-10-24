@@ -72,3 +72,25 @@
         margin-right: 5px;
     }
 }
+
+
+
+
+
+
+
+
+
+.shieldbadgesforSkills{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 20px;
+
+}
+.shieldbadgesforSkills img{
+    width: fit-content;
+    margin: 5px;
+    border: 1px solid rgb(167, 179, 193);
+    border-radius: 5px;
+}
