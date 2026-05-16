@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
   <style>
     :root {
@@ -315,77 +316,217 @@
     }
     .skill-tag:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
 
-    /* ── PROJECTS ── */
-    #projects .projects-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 24px;
+    /* ── PROJECTS ACCORDION ── */
+    .proj-list { display: flex; flex-direction: column; }
+
+    .proj-item {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden;
+      transition: background 0.35s;
     }
-    .project-card {
-      background: var(--card-bg); border: 1px solid var(--card-border);
-      border-radius: var(--radius); padding: 36px 32px;
-      position: relative; overflow: hidden;
-      transition: border-color 0.3s, transform 0.3s;
+    .proj-item:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
+    .proj-item.open { background: rgba(201,168,76,0.04); }
+
+    /* ── ROW (always visible) ── */
+    .proj-row {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      align-items: center; gap: 24px;
+      padding: 26px 8px;
+      cursor: pointer;
+      user-select: none;
     }
-    .project-card::after {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(201,168,76,0.06), transparent 70%);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .project-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-6px); }
-    .project-card:hover::after { opacity: 1; }
-    .project-num {
-      font-family: 'Cormorant Garamond', serif; font-size: 44px;
-      font-weight: 300; color: rgba(201,168,76,0.18);
-      line-height: 1; margin-bottom: 20px; user-select: none;
-    }
-    .project-title {
-      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600;
-      color: var(--text-primary); margin-bottom: 12px; line-height: 1.4;
-    }
-    .project-desc {
+    .proj-row:hover .proj-row-title { color: var(--gold); }
+
+    .proj-row-num {
       font-family: 'Cormorant Garamond', serif; font-size: 15px;
-      line-height: 1.7; color: var(--text-muted);
+      font-weight: 300; color: var(--text-muted); letter-spacing: 0.08em;
+      transition: color 0.25s;
     }
-    .project-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; }
-    .project-tag {
+    .proj-item.open .proj-row-num { color: var(--gold); }
+
+    .proj-row-title {
+      font-family: 'Syne', sans-serif; font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 700; color: var(--text-primary);
+      transition: color 0.25s; line-height: 1.2;
+    }
+
+    .proj-row-right {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .proj-row-tags {
+      display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end;
+    }
+    .proj-row-tag {
       font-family: 'DM Mono', monospace; font-size: 10px;
-      letter-spacing: 0.08em; padding: 3px 10px; border-radius: 100px;
+      letter-spacing: 0.08em; padding: 3px 11px; border-radius: 100px;
       background: var(--violet-dim); color: rgba(201,168,76,0.7);
       border: 1px solid rgba(107,63,160,0.25);
+      white-space: nowrap;
     }
-    .project-arrow {
-      position: absolute; top: 32px; right: 28px;
-      font-size: 18px; color: var(--gold-dim);
-      transition: color 0.2s, transform 0.2s;
-    }
-    .project-card:hover .project-arrow { color: var(--gold); transform: translate(3px,-3px); }
+    @media(max-width:680px){ .proj-row-tags { display: none; } }
 
-    /* ── EXPERIENCE / TIMELINE ── */
-    #experience .timeline { position: relative; padding-left: 32px; }
-    #experience .timeline::before {
-      content: ''; position: absolute; left: 0; top: 8px; bottom: 0;
-      width: 1px; background: linear-gradient(to bottom, var(--gold) 0%, transparent 100%);
+    .proj-toggle {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); transition: background 0.25s, border-color 0.25s, transform 0.35s, color 0.25s;
     }
-    .timeline-item {
-      position: relative; margin-bottom: 44px;
+    .proj-item.open .proj-toggle {
+      background: var(--gold); border-color: var(--gold);
+      color: var(--ink); transform: rotate(45deg);
     }
-    .timeline-item::before {
-      content: ''; position: absolute; left: -36px; top: 8px;
-      width: 9px; height: 9px; border-radius: 50%;
-      background: var(--gold); box-shadow: 0 0 0 4px var(--gold-dim);
+
+    /* ── PANEL (expanded content) ── */
+    .proj-panel {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.42s cubic-bezier(0.4,0,0.2,1);
     }
-    .timeline-title {
-      font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600;
-      color: var(--text-primary); margin-bottom: 4px;
+    .proj-item.open .proj-panel { grid-template-rows: 1fr; }
+
+    .proj-panel-inner {
+      overflow: hidden;
     }
-    .timeline-org {
-      font-family: 'DM Mono', monospace; font-size: 11px;
-      letter-spacing: 0.1em; color: var(--gold); margin-bottom: 12px;
+    .proj-panel-body {
+      display: grid; grid-template-columns: 1fr 320px; gap: 48px;
+      padding: 8px 8px 40px;
+      align-items: start;
     }
-    .timeline-desc {
+    @media(max-width:860px){
+      .proj-panel-body { grid-template-columns: 1fr; gap: 28px; }
+    }
+
+    .proj-desc-text {
+      font-family: 'Cormorant Garamond', serif; font-size: 19px;
+      line-height: 1.8; color: rgba(240,237,232,0.7);
+      margin-bottom: 24px;
+    }
+    .proj-detail-list { display: flex; flex-direction: column; gap: 10px; }
+    .proj-detail-item {
+      display: flex; align-items: flex-start; gap: 12px;
       font-family: 'Cormorant Garamond', serif; font-size: 16px;
-      line-height: 1.75; color: var(--text-muted);
+      color: rgba(240,237,232,0.6); line-height: 1.6;
     }
+    .proj-detail-item::before {
+      content: '✦'; color: var(--gold); font-size: 10px;
+      flex-shrink: 0; margin-top: 5px;
+    }
+
+    .proj-sidebar {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 24px;
+    }
+    .proj-sidebar-label {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.16em; color: var(--gold); text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .proj-stack-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .proj-stack-tag {
+      font-family: 'DM Mono', monospace; font-size: 11px;
+      padding: 5px 12px; border-radius: 100px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+    }
+    .proj-index-big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 80px; font-weight: 300;
+      color: rgba(201,168,76,0.07); line-height: 1;
+      text-align: right; margin-top: 8px; user-select: none;
+    }
+
+    /* ── EXPERIENCE SWIPER CARDS ── */
+    #experience .exp-swiper-section {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    #experience .swiper-exp {
+      width: 100%; max-width: 560px;
+      padding: 40px 20px 60px !important;
+      overflow: visible !important;
+    }
+    .exp-slide {
+      background: rgba(15,12,26,0.75);
+      border: 1px solid rgba(201,168,76,0.22);
+      border-radius: 22px;
+      padding: 0 0 28px 0;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 0 rgba(201,168,76,0);
+      transition: box-shadow 0.4s;
+    }
+    .swiper-slide-active .exp-slide {
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 40px rgba(201,168,76,0.08);
+    }
+    .exp-slide-img-wrap {
+      width: 100%; height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(107,63,160,0.12) 100%);
+      border-bottom: 1px solid rgba(201,168,76,0.12);
+      position: relative; overflow: hidden;
+    }
+    .exp-slide-img-wrap::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(201,168,76,0.06), transparent);
+    }
+    .exp-slide-img {
+      width: 90px; height: 90px; border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(201,168,76,0.35);
+      box-shadow: 0 0 0 6px rgba(201,168,76,0.07);
+      position: relative; z-index: 1;
+    }
+    .exp-slide-body { padding: 28px 30px 4px; }
+    .exp-slide-quote {
+      font-family: 'Cormorant Garamond', serif; font-size: 17px;
+      line-height: 1.8; color: rgba(240,237,232,0.72);
+      margin-bottom: 28px; position: relative; padding-left: 18px;
+    }
+    .exp-slide-quote::before {
+      content: '"'; position: absolute; left: 0; top: -6px;
+      font-size: 42px; color: rgba(201,168,76,0.3);
+      font-family: 'Cormorant Garamond', serif; line-height: 1;
+    }
+    .exp-slide-bottom {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 30px 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .exp-slide-accent {
+      width: 4px; height: 36px; border-radius: 2px;
+      background: linear-gradient(to bottom, var(--gold), rgba(201,168,76,0.2));
+      flex-shrink: 0;
+    }
+    .exp-slide-title {
+      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+      color: var(--text-primary); margin-bottom: 3px;
+    }
+    .exp-slide-role {
+      font-family: 'DM Mono', monospace; font-size: 10px;
+      letter-spacing: 0.12em; color: var(--gold); text-transform: uppercase;
+    }
+
+    /* Swiper overrides for exp */
+    .swiper-exp .swiper-pagination-bullet {
+      width: 22px; height: 4px; border-radius: 100px;
+      background: rgba(255,255,255,0.15); opacity: 1;
+      transition: background 0.3s, width 0.3s;
+    }
+    .swiper-exp .swiper-pagination-bullet::before { display: none; }
+    .swiper-exp .swiper-pagination-bullet-active {
+      background: var(--gold); width: 36px; opacity: 1;
+    }
+    .exp-nav-btns {
+      display: flex; gap: 14px; margin-top: 8px;
+    }
+    .exp-nav-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      color: var(--text-muted);
+    }
+    .exp-nav-btn:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); transform: scale(1.08); }
 
     /* ── ACHIEVEMENTS ── */
     #achievements .ach-list { display: flex; flex-direction: column; gap: 16px; }
@@ -745,63 +886,305 @@
     <section id="projects">
       <div class="section-label reveal">Work</div>
       <h2 class="section-title reveal reveal-delay-1">Selected<br><em>Projects</em></h2>
-      <div class="projects-grid" id="projectsGrid">
-        <div class="project-card reveal reveal-delay-1">
-          <div class="project-num">01</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">Crime Detection System</div>
-          <div class="project-desc">Real-time surveillance intelligence using Computer Vision to automatically detect and flag criminal activities from video feeds.</div>
-          <div class="project-tags"><span class="project-tag">Computer Vision</span><span class="project-tag">Python</span><span class="project-tag">Deep Learning</span></div>
+
+      <div class="proj-list reveal reveal-delay-2">
+
+        <!-- 01 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">01</span>
+            <span class="proj-row-title">Crime Detection System</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">Computer Vision</span>
+                <span class="proj-row-tag">Deep Learning</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Real-time surveillance intelligence using Computer Vision to automatically detect and flag criminal activities from live video feeds — enabling proactive security response.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">Real-time object and action detection pipeline</div>
+                <div class="proj-detail-item">Custom-trained model on crime dataset annotations</div>
+                <div class="proj-detail-item">Alert system with frame-level event logging</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">OpenCV</span>
+                <span class="proj-stack-tag">TensorFlow</span>
+                <span class="proj-stack-tag">YOLO</span>
+              </div>
+              <div class="proj-index-big">01</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-2">
-          <div class="project-num">02</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">Hand Gesture Recognition</div>
-          <div class="project-desc">Assistive communication system translating hand gestures into natural language to empower speech-impaired individuals.</div>
-          <div class="project-tags"><span class="project-tag">MediaPipe</span><span class="project-tag">TensorFlow</span><span class="project-tag">Accessibility</span></div>
+
+        <!-- 02 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">02</span>
+            <span class="proj-row-title">Hand Gesture Recognition</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">MediaPipe</span>
+                <span class="proj-row-tag">Accessibility</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Assistive communication system translating hand gestures into natural language in real time — empowering speech-impaired individuals to hold natural conversations.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">21-landmark hand skeleton tracking via MediaPipe</div>
+                <div class="proj-detail-item">Custom gesture classifier with 95%+ accuracy</div>
+                <div class="proj-detail-item">Text-to-speech output for seamless communication</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">MediaPipe</span>
+                <span class="proj-stack-tag">TensorFlow</span>
+                <span class="proj-stack-tag">pyttsx3</span>
+              </div>
+              <div class="proj-index-big">02</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-3">
-          <div class="project-num">03</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">Eye-Controlled Mouse</div>
-          <div class="project-desc">Deep learning-powered gaze tracking system enabling full Windows navigation using only eye movements — no hands required.</div>
-          <div class="project-tags"><span class="project-tag">OpenCV</span><span class="project-tag">Gaze Tracking</span><span class="project-tag">DL</span></div>
+
+        <!-- 03 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">03</span>
+            <span class="proj-row-title">Eye-Controlled Mouse</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">Gaze Tracking</span>
+                <span class="proj-row-tag">OpenCV</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Deep learning-powered gaze tracking system enabling full Windows navigation using only eye movements — no hands required. Built for accessibility and hands-free computing.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">Real-time iris position tracking at 30fps</div>
+                <div class="proj-detail-item">Blink detection mapped to mouse click events</div>
+                <div class="proj-detail-item">Calibration system for different face geometries</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">OpenCV</span>
+                <span class="proj-stack-tag">dlib</span>
+                <span class="proj-stack-tag">PyAutoGUI</span>
+              </div>
+              <div class="proj-index-big">03</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-1">
-          <div class="project-num">04</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">Meta LLAMA AI Assistant</div>
-          <div class="project-desc">Fine-tuned LLaMA 7B on a personal knowledge base to create an interactive AI assistant that can answer questions about me.</div>
-          <div class="project-tags"><span class="project-tag">LLaMA</span><span class="project-tag">LLM Fine-tuning</span><span class="project-tag">NLP</span></div>
+
+        <!-- 04 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">04</span>
+            <span class="proj-row-title">Meta LLaMA AI Assistant</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">LLM Fine-tuning</span>
+                <span class="proj-row-tag">NLP</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Fine-tuned Meta's LLaMA 7B on a custom personal knowledge base, creating an interactive AI assistant that answers questions about me — deployed as a live chatbot.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">QLoRA fine-tuning on custom knowledge corpus</div>
+                <div class="proj-detail-item">RAG pipeline for retrieval-augmented responses</div>
+                <div class="proj-detail-item">Deployed via Botpress with embedded webchat UI</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">LLaMA 7B</span>
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">HuggingFace</span>
+                <span class="proj-stack-tag">Botpress</span>
+              </div>
+              <div class="proj-index-big">04</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-2">
-          <div class="project-num">05</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">OTT Entertainment Platform</div>
-          <div class="project-desc">Full-featured streaming platform built on MEAN stack architecture with authentication, recommendations, and media playback.</div>
-          <div class="project-tags"><span class="project-tag">MongoDB</span><span class="project-tag">Express</span><span class="project-tag">Angular</span><span class="project-tag">Node.js</span></div>
+
+        <!-- 05 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">05</span>
+            <span class="proj-row-title">OTT Entertainment Platform</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">MEAN Stack</span>
+                <span class="proj-row-tag">Full Stack</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Full-featured streaming platform built on MEAN stack architecture with JWT auth, content recommendations, and adaptive media playback — a Netflix-inspired web app.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">JWT-based authentication and role management</div>
+                <div class="proj-detail-item">REST API with paginated content delivery</div>
+                <div class="proj-detail-item">Angular SPA with lazy-loaded route modules</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">MongoDB</span>
+                <span class="proj-stack-tag">Express</span>
+                <span class="proj-stack-tag">Angular</span>
+                <span class="proj-stack-tag">Node.js</span>
+              </div>
+              <div class="proj-index-big">05</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-3">
-          <div class="project-num">06</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">LiFi Network Research</div>
-          <div class="project-desc">Exploration of Light Fidelity technology as an eco-friendly, high-bandwidth alternative to WiFi with lower latency and zero RF interference.</div>
-          <div class="project-tags"><span class="project-tag">Hardware</span><span class="project-tag">IoT</span><span class="project-tag">Research</span></div>
+
+        <!-- 06 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">06</span>
+            <span class="proj-row-title">LiFi Network Research</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">Hardware</span>
+                <span class="proj-row-tag">IoT</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Exploration of Light Fidelity technology as an eco-friendly, high-bandwidth WiFi replacement — achieving lower latency, zero RF interference, and superior data security.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">LED-modulated data transmission prototype</div>
+                <div class="proj-detail-item">Comparative latency benchmarking vs WiFi 6</div>
+                <div class="proj-detail-item">Research paper on spectrum efficiency gains</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Arduino</span>
+                <span class="proj-stack-tag">Raspberry Pi</span>
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">Hardware</span>
+              </div>
+              <div class="proj-index-big">06</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-1">
-          <div class="project-num">07</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">Firebase × Vue.js App</div>
-          <div class="project-desc">Reactive SPA with real-time Firestore sync, cloud functions, and Firebase Auth for seamless user experiences.</div>
-          <div class="project-tags"><span class="project-tag">Vue.js</span><span class="project-tag">Firebase</span><span class="project-tag">GCP</span></div>
+
+        <!-- 07 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">07</span>
+            <span class="proj-row-title">Firebase × Vue.js App</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">Vue.js</span>
+                <span class="proj-row-tag">Firebase</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">Reactive single-page application with real-time Firestore data sync, Firebase Auth, and cloud functions — delivering seamless collaborative user experiences.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">Realtime Firestore listeners with optimistic UI updates</div>
+                <div class="proj-detail-item">OAuth2 + email/password authentication flows</div>
+                <div class="proj-detail-item">Cloud Functions for serverless backend logic</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Vue.js</span>
+                <span class="proj-stack-tag">Firebase</span>
+                <span class="proj-stack-tag">Firestore</span>
+                <span class="proj-stack-tag">GCP</span>
+              </div>
+              <div class="proj-index-big">07</div>
+            </div>
+          </div></div></div>
         </div>
-        <div class="project-card reveal reveal-delay-2">
-          <div class="project-num">08</div>
-          <div class="project-arrow">↗</div>
-          <div class="project-title">IoT Sensor Data Messaging</div>
-          <div class="project-desc">Seamless pipeline collecting sensor telemetry via MQTT messaging to build high-quality training datasets for ML models.</div>
-          <div class="project-tags"><span class="project-tag">IoT</span><span class="project-tag">MQTT</span><span class="project-tag">Data Pipeline</span></div>
+
+        <!-- 08 -->
+        <div class="proj-item">
+          <div class="proj-row">
+            <span class="proj-row-num">08</span>
+            <span class="proj-row-title">IoT Sensor Data Messaging</span>
+            <div class="proj-row-right">
+              <div class="proj-row-tags">
+                <span class="proj-row-tag">IoT</span>
+                <span class="proj-row-tag">MQTT</span>
+              </div>
+              <div class="proj-toggle">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="proj-panel"><div class="proj-panel-inner"><div class="proj-panel-body">
+            <div>
+              <p class="proj-desc-text">End-to-end IoT pipeline collecting sensor telemetry via MQTT messaging protocol, processing and storing data to build high-quality training datasets for machine learning models.</p>
+              <div class="proj-detail-list">
+                <div class="proj-detail-item">MQTT broker with multi-sensor topic routing</div>
+                <div class="proj-detail-item">Time-series data ingestion and cleaning pipeline</div>
+                <div class="proj-detail-item">Automated dataset export in ML-ready format</div>
+              </div>
+            </div>
+            <div class="proj-sidebar">
+              <div class="proj-sidebar-label">Tech Stack</div>
+              <div class="proj-stack-tags">
+                <span class="proj-stack-tag">Python</span>
+                <span class="proj-stack-tag">MQTT</span>
+                <span class="proj-stack-tag">InfluxDB</span>
+                <span class="proj-stack-tag">Raspberry Pi</span>
+              </div>
+              <div class="proj-index-big">08</div>
+            </div>
+          </div></div></div>
         </div>
+
       </div>
     </section>
 
@@ -811,31 +1194,128 @@
     <section id="experience">
       <div class="section-label reveal">Journey</div>
       <h2 class="section-title reveal reveal-delay-1">Experience &<br><em>Highlights</em></h2>
-      <div class="timeline">
-        <div class="timeline-item reveal reveal-delay-1">
-          <div class="timeline-title">Vice-President — AI Department</div>
-          <div class="timeline-org">Computer Society of India (CSI) Student Chapter</div>
-          <div class="timeline-desc">Lead AI initiatives, organize workshops, and bridge the gap between academic research and practical application for 200+ student members.</div>
+      <div class="exp-swiper-section reveal reveal-delay-2">
+        <div class="swiper swiper-exp" id="expSwiper">
+          <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="https://scontent.fbep2-1.fna.fbcdn.net/v/t39.30808-1/306752468_3352183928438717_2219624463445094667_n.jpg?stp=dst-jpg_p200x200&_nc_cat=110&ccb=1-7&_nc_sid=f4b9fd&_nc_ohc=tjO1Pee_J3kQ7kNvgE_YQks&_nc_ht=scontent.fbep2-1.fna&oh=00_AYBMlcCzCM6hrmdAiM1jgejF4eK0VTEjGklqWZ9-dGQa-g&oe=66C160C3" alt="CSI" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">The seed for the Computer Society of India (CSI) was first shown in the year 1965 with a handful of IT enthusiasts who felt the need to organize their activities. I now lead the AI department as Vice-President.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">CSI Student Chapter AI Department</div>
+                    <div class="exp-slide-role">Vice-President</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="http://anurag.edu.in/wp-content/uploads/2023/02/Group-7342.png" alt="Anurag AI Club" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">A club of innovation and learning where like-minded individuals come together to explore the fascinating world of AI. Our members are encouraged to push the boundaries of what's possible.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">Anurag Artificial Intelligence Club</div>
+                    <div class="exp-slide-role">Technical Secretary</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="https://media.instamojo.com/imgs/03aa842d4fff46bfb9fafdcb0e55e114.png" alt="IJRTI" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">IJRTI is a nationally accepted journal publisher, where I have published a paper on Alternative Medicine Recommendation System using Machine Learning.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">IJRTI Journal</div>
+                    <div class="exp-slide-role">Published Research Paper</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="https://play-lh.googleusercontent.com/jOOCxt0YRNlAEmJ4In1roEjEyjisdGakTGTzPzxdjB8KtpIU4VIUVxVNshcjqRUGejQ" alt="SIH" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">Smart India Hackathon is a premier nationwide initiative designed to engage students in solving the most pressing challenges — fostering innovation and practical problem-solving.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">SIH 2024 Participant</div>
+                    <div class="exp-slide-role">Smart India Hackathon</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="https://www.primotech.com/wp-content/uploads/2024/02/Ai-Image-of-Meta-logo.png" alt="Meta LLaMA" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">Using META's pretrained 7-billion parameter model, trained on a custom knowledge base to make it able to know all my details — helping others learn about me through an AI chat bot.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">Meta LLaMA Custom AI Assistant</div>
+                    <div class="exp-slide-role">Building a Realtime Chat Assistant</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="exp-slide">
+                <div class="exp-slide-img-wrap">
+                  <img class="exp-slide-img" src="https://media.licdn.com/dms/image/D4E03AQGN-wkT0K5Bsw/profile-displayphoto-shrink_200_200/0/1668756176046?e=2147483647&v=beta&t=cbNGNoqWd2OAqNqZXxrOPWAVXtpjJo6vRdPPmlaJF70" alt="Mobility Summit" />
+                </div>
+                <div class="exp-slide-body">
+                  <div class="exp-slide-quote">The Government of Telangana and CII organized the first edition of Mobility Next India Summit 2023 — a global sustainable mobility forum at the forefront of EV vehicle importance.</div>
+                </div>
+                <div class="exp-slide-bottom">
+                  <div class="exp-slide-accent"></div>
+                  <div>
+                    <div class="exp-slide-title">Mobility Next Hyderabad Summit</div>
+                    <div class="exp-slide-role">Organized by Telangana Govt. at Novotel</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="swiper-pagination"></div>
         </div>
-        <div class="timeline-item reveal reveal-delay-2">
-          <div class="timeline-title">Technical Secretary</div>
-          <div class="timeline-org">Anurag Artificial Intelligence Club</div>
-          <div class="timeline-desc">Curate technical curriculum, mentor peers on ML/DL projects, and drive collaborative hackathon participation across departments.</div>
-        </div>
-        <div class="timeline-item reveal reveal-delay-3">
-          <div class="timeline-title">Research Publication — IJRTI Journal</div>
-          <div class="timeline-org">Alternative Medicine Recommendation System using ML</div>
-          <div class="timeline-desc">Published peer-reviewed research on a machine learning system for recommending alternative medicine treatments based on patient data patterns.</div>
-        </div>
-        <div class="timeline-item reveal reveal-delay-4">
-          <div class="timeline-title">SIH 2024 Participant</div>
-          <div class="timeline-org">Smart India Hackathon</div>
-          <div class="timeline-desc">Competed in India's premier national hackathon, developing solutions for government-identified problem statements in 36-hour intensive sprints.</div>
-        </div>
-        <div class="timeline-item reveal reveal-delay-1">
-          <div class="timeline-title">Mobility Next Hyderabad Summit</div>
-          <div class="timeline-org">Organized by Telangana Government × CII at Novotel</div>
-          <div class="timeline-desc">Attended the inaugural global sustainable mobility forum focused on EV infrastructure and the future of clean transportation in India.</div>
+        <div class="exp-nav-btns">
+          <button class="exp-nav-btn" id="expPrev2" aria-label="Previous">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="exp-nav-btn" id="expNext2" aria-label="Next">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -929,6 +1409,7 @@
 
   </div><!-- /wrapper -->
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script>
     // Custom cursor
     const cursor = document.getElementById('cursor');
@@ -961,12 +1442,30 @@
       document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
     });
 
-    // Project card mouse glow
-    document.querySelectorAll('.project-card').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    // Experience Swiper — cards effect (same as original)
+    const expSwiper = new Swiper('#expSwiper', {
+      effect: 'cards',
+      grabCursor: true,
+      centeredSlides: true,
+      pagination: {
+        el: '#expSwiper .swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '#expNext2',
+        prevEl: '#expPrev2',
+      },
+      keyboard: { enabled: true },
+    });
+
+    // Projects accordion
+    document.querySelectorAll('.proj-item').forEach(item => {
+      item.querySelector('.proj-row').addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.proj-item.open').forEach(el => el.classList.remove('open'));
+        // Toggle clicked
+        if (!isOpen) item.classList.add('open');
       });
     });
   </script>
